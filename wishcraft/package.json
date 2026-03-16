@@ -1,0 +1,84 @@
+{
+  "name": "wishcraft",
+  "version": "1.0.0",
+  "description": "Wishcraft — Voice & Text-controlled desktop genie with 3D holographic avatar",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "install-python": "pip3 install -r python/requirements.txt"
+  },
+  "author": "Abu Bokkor",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abubokkor-cse/wishcraft.git"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "pptxgenjs": "^4.0.1"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.wishcraft.genie",
+    "productName": "WishCraft",
+    "icon": "build/icon.png",
+    "files": [
+      "main.js",
+      "preload.js",
+      "config-store.js",
+      "contacts.js",
+      "renderer/**/*",
+      "python/**/*",
+      "assets/**/*",
+      "skills/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "python/requirements.txt",
+        "to": "python/requirements.txt"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "build/icon.icns",
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "title": "WishCraft",
+      "artifactName": "WishCraft-${version}-${arch}.dmg"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/icon.ico",
+      "artifactName": "WishCraft-${version}-Setup.exe"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Utility",
+      "icon": "build/icon.png",
+      "artifactName": "WishCraft-${version}-${arch}.${ext}"
+    }
+  }
+}

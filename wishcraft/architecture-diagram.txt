@@ -1,0 +1,164 @@
+// WishCraft — Universal UI Navigator
+direction right
+
+title WishCraft — Full System Architecture
+
+// ===== FRONTEND =====
+Frontend Electron Desktop App [color: lightblue] {
+  3D Genie Avatar ThreeJS Lip Sync [shape: rectangle, color: lightblue, icon: user]
+  Chat Panel 4 Tabs Frosted Glass [shape: rectangle, color: lightblue, icon: message-square]
+  Voice Input Bidirectional Audio [shape: rectangle, color: lightblue, icon: mic]
+  File Upload Images Video Audio PDF [shape: rectangle, color: lightblue, icon: upload]
+  Screen Capture 1 FPS [shape: rectangle, color: lightblue, icon: monitor]
+  Webcam Feed [shape: rectangle, color: lightblue, icon: camera]
+  Settings Voice Language Avatar [shape: rectangle, color: lightblue, icon: settings]
+}
+
+// ===== CORE BRAIN =====
+Core Brain [color: lightgreen] {
+  Gemini Live API WebSocket [shape: rectangle, color: lightgreen, icon: zap]
+  Agent Brain 38 Tools [shape: rectangle, color: lightgreen, icon: brain]
+  3-Tier Router [shape: rectangle, color: orange, icon: git-branch]
+  Conversation Context [shape: rectangle, color: lightgreen, icon: clock]
+  Task Scheduler [shape: rectangle, color: lightgreen, icon: check-square]
+}
+
+// ===== 3 GEMINI MODELS =====
+Gemini Models [color: pink] {
+  gemini-2.5-flash-native-audio The Brain [shape: rectangle, color: pink, icon: cpu]
+  gemini-2.5-computer-use The Hands [shape: rectangle, color: salmon, icon: mouse-pointer]
+  gemini-3-flash The Writer [shape: rectangle, color: pink, icon: edit]
+  Google Search Grounding [shape: rectangle, color: pink, icon: search]
+}
+
+// ===== TIER 1 UNIVERSAL =====
+Tier 1 Universal executor.py commands.py [color: cyan] {
+  PyAutoGUI Click Type Scroll Drag [shape: rectangle, color: cyan, icon: mouse-pointer]
+  Apps Volume Brightness Lock Screen [shape: rectangle, color: cyan, icon: sliders]
+  File Search Organizer Notify [shape: rectangle, color: cyan, icon: folder-search]
+  Background Removal rembg [shape: rectangle, color: cyan, icon: image]
+}
+
+// ===== TIER 2 PLATFORM =====
+Tier 2 Platform 540+ Functions [color: yellow] {
+  macOS AppleScript PyAutoGUI [shape: rectangle, color: yellow, icon: monitor]
+  Windows PowerShell PyAutoGUI [shape: rectangle, color: yellow, icon: monitor]
+  Linux xdotool PyAutoGUI [shape: rectangle, color: yellow, icon: monitor]
+  33+ Apps Word Excel Gmail Chrome VS Code YouTube WhatsApp Notes [shape: rectangle, color: yellow, icon: layout]
+}
+
+// ===== TIER 3 COMPUTER USE =====
+Tier 3 Computer Use Agent [color: salmon] {
+  Screenshot Analyze [shape: rectangle, color: salmon, icon: camera]
+  Execute Click Type Scroll Navigate [shape: rectangle, color: salmon, icon: mouse-pointer]
+  Loop Until Task Done [shape: rectangle, color: salmon, icon: repeat]
+}
+
+// ===== COLLABORATOR =====
+Content Collaborator [color: lavender] {
+  Content Gen CV Essay Report Code [shape: rectangle, color: lavender, icon: file-text]
+  File Analyzer Images PDF CSV JSON [shape: rectangle, color: lavender, icon: eye]
+  PPTX Builder 10 Themes [shape: rectangle, color: lavender, icon: presentation]
+  Audio Transcriber [shape: rectangle, color: lavender, icon: headphones]
+}
+
+// ===== SECURITY =====
+Security AES-256-GCM [color: lightgray] {
+  Encrypted API Key [shape: rectangle, color: lightgray, icon: key]
+  Encrypted Chat History [shape: rectangle, color: lightgray, icon: database]
+  Encrypted Memory and Contacts [shape: rectangle, color: lightgray, icon: lock]
+}
+
+// ===== GOOGLE CLOUD BACKEND =====
+Google Cloud Backend [color: violet] {
+  Cloud Run Express API 12 Endpoints [shape: rectangle, color: violet, icon: server]
+  Ephemeral Token Server 5-Min TTL [shape: rectangle, color: violet, icon: key]
+  Computer Use Proxy Python [shape: rectangle, color: violet, icon: mouse-pointer]
+  Firestore Credits Wishes Transactions [shape: rectangle, color: violet, icon: database]
+  Cloud Storage Encrypted Sync [shape: rectangle, color: violet, icon: cloud]
+  Credit System Purchase and Deduct [shape: rectangle, color: violet, icon: credit-card]
+}
+
+// ===== FIREBASE =====
+Firebase Hosting [color: lightcoral] {
+  wishcraft.web.app Landing Page [shape: rectangle, color: lightcoral, icon: globe]
+}
+
+// ===== RELATIONSHIPS =====
+
+// Frontend → Core Brain
+Voice Input Bidirectional Audio > Gemini Live API WebSocket
+Chat Panel 4 Tabs Frosted Glass > Agent Brain 38 Tools
+File Upload Images Video Audio PDF > Agent Brain 38 Tools
+Screen Capture 1 FPS > Gemini Live API WebSocket
+Webcam Feed > Gemini Live API WebSocket
+Settings Voice Language Avatar > 3D Genie Avatar ThreeJS Lip Sync
+
+// Core Brain internal
+Gemini Live API WebSocket > Agent Brain 38 Tools
+Agent Brain 38 Tools > 3-Tier Router
+Agent Brain 38 Tools > Conversation Context
+Agent Brain 38 Tools > Task Scheduler
+
+// Brain ↔ Gemini Models
+Gemini Live API WebSocket > gemini-2.5-flash-native-audio The Brain
+Agent Brain 38 Tools > Google Search Grounding
+gemini-2.5-flash-native-audio The Brain > 3D Genie Avatar ThreeJS Lip Sync
+
+// 3-Tier Router → Tiers
+3-Tier Router > PyAutoGUI Click Type Scroll Drag
+3-Tier Router > macOS AppleScript PyAutoGUI
+3-Tier Router > Windows PowerShell PyAutoGUI
+3-Tier Router > Linux xdotool PyAutoGUI
+3-Tier Router > Screenshot Analyze
+
+// Tier 2 → Apps
+macOS AppleScript PyAutoGUI > 33+ Apps Word Excel Gmail Chrome VS Code YouTube WhatsApp Notes
+Windows PowerShell PyAutoGUI > 33+ Apps Word Excel Gmail Chrome VS Code YouTube WhatsApp Notes
+Linux xdotool PyAutoGUI > 33+ Apps Word Excel Gmail Chrome VS Code YouTube WhatsApp Notes
+
+// Auto-escalation: Tier 2 fails → Tier 3
+33+ Apps Word Excel Gmail Chrome VS Code YouTube WhatsApp Notes > Screenshot Analyze: fails → escalate
+
+// Tier 3 Computer Use loop
+Screenshot Analyze > gemini-2.5-computer-use The Hands
+gemini-2.5-computer-use The Hands > Execute Click Type Scroll Navigate
+Execute Click Type Scroll Navigate > Loop Until Task Done
+Loop Until Task Done > Screenshot Analyze
+
+// Brain → Collaborator
+Agent Brain 38 Tools > Content Gen CV Essay Report Code
+Agent Brain 38 Tools > File Analyzer Images PDF CSV JSON
+Agent Brain 38 Tools > PPTX Builder 10 Themes
+Agent Brain 38 Tools > Audio Transcriber
+
+// Collaborator → Gemini 3 Flash
+Content Gen CV Essay Report Code > gemini-3-flash The Writer
+File Analyzer Images PDF CSV JSON > gemini-3-flash The Writer
+PPTX Builder 10 Themes > gemini-3-flash The Writer
+Audio Transcriber > gemini-3-flash The Writer
+
+// Content output → Desktop
+Content Gen CV Essay Report Code > 33+ Apps Word Excel Gmail Chrome VS Code YouTube WhatsApp Notes: auto-writes to Word
+
+// Security connections
+Encrypted API Key > Gemini Live API WebSocket
+Encrypted Chat History > Chat Panel 4 Tabs Frosted Glass
+Encrypted Memory and Contacts > Conversation Context
+
+// Cloud Backend connections
+Ephemeral Token Server 5-Min TTL > Gemini Live API WebSocket: provides API key
+Computer Use Proxy Python > Screenshot Analyze
+Cloud Run Express API 12 Endpoints > Ephemeral Token Server 5-Min TTL
+Cloud Run Express API 12 Endpoints > Computer Use Proxy Python
+Cloud Run Express API 12 Endpoints > Firestore Credits Wishes Transactions
+Cloud Run Express API 12 Endpoints > Cloud Storage Encrypted Sync
+Cloud Run Express API 12 Endpoints > Credit System Purchase and Deduct
+Credit System Purchase and Deduct > Firestore Credits Wishes Transactions
+
+// Cloud Sync
+Encrypted Chat History > Cloud Storage Encrypted Sync: optional backup
+Encrypted Memory and Contacts > Cloud Storage Encrypted Sync: optional backup
+
+// Firebase
+wishcraft.web.app Landing Page > Cloud Run Express API 12 Endpoints

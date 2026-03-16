@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>WishCraft Chat</title>
+    <link rel="stylesheet" href="panel.css">
+    <style>
+        /* Tab bar — Frosted Glass Tabs */
+        .tab-bar {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--accent-cyan);
+            border-bottom-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .tab-btn:hover {
+            color: var(--text-secondary);
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .section.active {
+            display: flex;
+        }
+
+        /* Task list */
+        .task-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .task-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .task-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .task-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 12px;
+            animation: messageIn 0.3s ease-out;
+        }
+
+        .task-name {
+            flex: 1;
+            color: var(--text-primary);
+        }
+
+        .task-schedule {
+            color: var(--accent-cyan);
+            font-size: 10px;
+        }
+
+        .task-remove {
+            background: rgba(255, 50, 50, 0.12);
+            border: 1px solid rgba(255, 50, 50, 0.2);
+            color: rgba(255, 100, 100, 0.7);
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.2s;
+        }
+
+        .task-remove:hover {
+            background: rgba(255, 50, 50, 0.25);
+            color: #fff;
+        }
+
+        .task-empty {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .task-empty-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        /* Screenshot in chat */
+        .screenshot-bubble {
+            max-width: 100%;
+            border-radius: 12px;
+            margin: 6px 0;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: messageIn 0.3s ease-out;
+            cursor: pointer;
+        }
+
+        .screenshot-bubble img {
+            width: 100%;
+            display: block;
+            border-radius: 12px;
+        }
+
+        .screenshot-bubble:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Settings section */
+        .settings-section {
+            padding: 14px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .settings-section::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .settings-section::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .settings-section::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+
+        .settings-section h3 {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .setting-row label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .setting-row select {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 6px;
+            padding: 4px 8px;
+            color: var(--text-primary);
+            font-size: 11px;
+            outline: none;
+            width: 150px;
+        }
+
+        .btn-apply {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-secondary);
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-apply:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Contacts section */
+        .contacts-section {
+            padding: 14px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .contacts-section::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .contacts-section::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .contacts-section::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+
+        .contacts-section h3 {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 12px;
+            animation: messageIn 0.3s ease-out;
+        }
+
+        .contact-name {
+            flex: 1;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .contact-phone {
+            color: var(--accent-cyan);
+            font-size: 11px;
+            font-family: monospace;
+        }
+
+        .contact-remove {
+            background: rgba(255, 50, 50, 0.12);
+            border: 1px solid rgba(255, 50, 50, 0.2);
+            color: rgba(255, 100, 100, 0.7);
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.2s;
+        }
+
+        .contact-remove:hover {
+            background: rgba(255, 50, 50, 0.25);
+            color: #fff;
+        }
+
+        .contact-empty {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .contact-add-form {
+            display: flex;
+            gap: 6px;
+            padding: 0 0 8px 0;
+        }
+
+        .contact-add-form input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 6px;
+            padding: 6px 8px;
+            color: var(--text-primary);
+            font-size: 11px;
+            outline: none;
+        }
+
+        .contact-add-form input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .contact-add-form input:focus {
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .contact-add-form button {
+            background: rgba(0, 200, 100, 0.15);
+            border: 1px solid rgba(0, 200, 100, 0.3);
+            color: rgba(0, 220, 150, 0.8);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .contact-add-form button:hover {
+            background: rgba(0, 200, 100, 0.3);
+        }
+
+        .contacts-path {
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-top: 10px;
+            word-break: break-all;
+        }
+
+        /* Chat History Overlay — Frosted Glass */
+        .history-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(8, 4, 25, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 50;
+            flex-direction: column;
+            animation: fade-in 0.2s ease;
+        }
+
+        .history-overlay.visible {
+            display: flex;
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-header h3 {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-new-chat {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--accent-cyan);
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .btn-new-chat:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .btn-close-history {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-close-history:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+
+        .history-group-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            padding: 8px 8px 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            margin-bottom: 2px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .history-item:hover {
+            background: rgba(100, 50, 255, 0.12);
+        }
+
+        .history-item.active {
+            background: rgba(0, 180, 255, 0.12);
+            border: 1px solid rgba(0, 200, 255, 0.2);
+        }
+
+        .history-item-title {
+            flex: 1;
+            font-size: 12px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item-meta {
+            font-size: 9px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .history-item-delete {
+            background: none;
+            border: none;
+            color: rgba(255, 100, 100, 0.4);
+            cursor: pointer;
+            font-size: 11px;
+            padding: 2px 4px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: all 0.15s;
+        }
+
+        .history-item:hover .history-item-delete {
+            opacity: 1;
+        }
+
+        .history-item-delete:hover {
+            color: rgba(255, 100, 100, 0.9);
+            background: rgba(255, 50, 50, 0.1);
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .history-empty-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        /* Mouse-responsive border highlights (Apple Liquid Glass) */
+        .glass-border-highlight {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            border-radius: inherit;
+            pointer-events: none;
+            padding: 1.5px;
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.5) inset,
+                0 1px 3px rgba(255, 255, 255, 0.25) inset,
+                0 1px 4px rgba(0, 0, 0, 0.35);
+            transition: background 0.15s ease;
+        }
+
+        .glass-border-screen {
+            mix-blend-mode: screen;
+            opacity: 0.25;
+        }
+
+        .glass-border-overlay {
+            mix-blend-mode: overlay;
+        }
+
+        /* Hover glow overlay (Apple-style top highlight) */
+        .glass-hover-glow {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            border-radius: inherit;
+            pointer-events: none;
+            opacity: 0;
+            background-image: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 50%);
+            mix-blend-mode: overlay;
+            transition: opacity 0.3s ease;
+        }
+
+        .glass-panel:hover .glass-hover-glow {
+            opacity: 0.35;
+        }
+    </style>
+</head>
+
+<body class="panel-body">
+
+    <!-- SVG Filters — Chromatic Aberration Liquid Glass (ported from liquid-glass-react) -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="position: absolute; width: 0; height: 0;" aria-hidden="true">
+        <defs>
+            <filter id="lensFilter" x="-15%" y="-15%" width="130%" height="130%" colorInterpolationFilters="sRGB">
+                <!-- Displacement map: radial gradient for edge-focused refraction -->
+                <feImage x="0" y="0" width="100%" height="100%" result="DISP_MAP"
+                    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='600'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23808080'/%3E%3Cstop offset='70%25' stop-color='%23808080'/%3E%3Cstop offset='100%25' stop-color='%23604090'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='400' height='600' fill='url(%23g)'/%3E%3C/svg%3E"
+                    preserveAspectRatio="xMidYMid slice" />
+
+                <!-- Edge mask from displacement map -->
+                <feColorMatrix in="DISP_MAP" type="matrix"
+                    values="0.3 0.3 0.3 0 0  0.3 0.3 0.3 0 0  0.3 0.3 0.3 0 0  0 0 0 1 0" result="EDGE_INTENSITY" />
+                <feComponentTransfer in="EDGE_INTENSITY" result="EDGE_MASK">
+                    <feFuncA type="discrete" tableValues="0 0.1 1" />
+                </feComponentTransfer>
+
+                <!-- Red channel displacement -->
+                <feDisplacementMap in="SourceGraphic" in2="DISP_MAP" scale="-40" xChannelSelector="R"
+                    yChannelSelector="B" result="RED_DISPLACED" />
+                <feColorMatrix in="RED_DISPLACED" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"
+                    result="RED_CH" />
+
+                <!-- Green channel displacement (slightly different scale for chromatic aberration) -->
+                <feDisplacementMap in="SourceGraphic" in2="DISP_MAP" scale="-44" xChannelSelector="R"
+                    yChannelSelector="B" result="GREEN_DISPLACED" />
+                <feColorMatrix in="GREEN_DISPLACED" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"
+                    result="GREEN_CH" />
+
+                <!-- Blue channel displacement (most offset for rainbow edge) -->
+                <feDisplacementMap in="SourceGraphic" in2="DISP_MAP" scale="-48" xChannelSelector="R"
+                    yChannelSelector="B" result="BLUE_DISPLACED" />
+                <feColorMatrix in="BLUE_DISPLACED" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"
+                    result="BLUE_CH" />
+
+                <!-- Recombine channels with screen blend for chromatic aberration -->
+                <feBlend in="GREEN_CH" in2="BLUE_CH" mode="screen" result="GB_COMBINED" />
+                <feBlend in="RED_CH" in2="GB_COMBINED" mode="screen" result="RGB_COMBINED" />
+
+                <!-- Soften the aberration -->
+                <feGaussianBlur in="RGB_COMBINED" stdDeviation="0.4" result="ABERRATED" />
+
+                <!-- Apply edge mask so aberration only at edges -->
+                <feComposite in="ABERRATED" in2="EDGE_MASK" operator="in" result="EDGE_ABERRATION" />
+
+                <!-- Clean center (no distortion) -->
+                <feOffset in="SourceGraphic" dx="0" dy="0" result="CENTER_ORIGINAL" />
+                <feComponentTransfer in="EDGE_MASK" result="INVERTED_MASK">
+                    <feFuncA type="table" tableValues="1 0" />
+                </feComponentTransfer>
+                <feComposite in="CENTER_ORIGINAL" in2="INVERTED_MASK" operator="in" result="CENTER_CLEAN" />
+
+                <!-- Combine: clean center + aberrated edges -->
+                <feComposite in="EDGE_ABERRATION" in2="CENTER_CLEAN" operator="over" />
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="glass-panel visible">
+        <div class="glass-filter"></div>
+        <div class="glass-overlay"></div>
+        <div class="glass-specular"></div>
+        <!-- Mouse-responsive border highlight layers -->
+        <span class="glass-border-highlight glass-border-screen"></span>
+        <span class="glass-border-highlight glass-border-overlay"></span>
+        <div class="glass-hover-glow"></div>
+        <div class="glass-content">
+            <!-- Header -->
+            <div id="panel-header" class="panel-drag-handle">
+                <div class="panel-title">
+                    <span class="panel-icon">🧞</span>
+                    <span>WishCraft</span>
+                </div>
+                <div class="panel-controls">
+                    <button id="btn-history" class="panel-btn" title="Chat history">📜</button>
+                    <button id="btn-new-chat-header" class="panel-btn" title="New chat">+</button>
+                    <button id="btn-close-panel" class="panel-btn" title="Close">✕</button>
+                </div>
+            </div>
+
+            <!-- Connection Status -->
+            <div id="connection-status" class="connection-status">
+                <span class="status-dot"></span>
+                <span id="status-text">Waiting for genie...</span>
+            </div>
+
+            <!-- Tab Bar -->
+            <div class="tab-bar">
+                <button class="tab-btn active" data-section="chat">💬 Chat</button>
+                <button class="tab-btn" data-section="tasks">📋 Tasks</button>
+                <button class="tab-btn" data-section="contacts">📇 Contacts</button>
+                <button class="tab-btn" data-section="settings">⚙️ Settings</button>
+            </div>
+
+            <!-- Active Wish -->
+            <div id="active-wish" class="active-wish hidden">
+                <div class="wish-spinner"></div>
+                <span id="active-wish-text">Executing wish...</span>
+            </div>
+
+            <!-- CHAT Section -->
+            <div id="section-chat" class="section active">
+                <div id="wish-chat" class="wish-chat">
+                    <div class="wish-welcome">
+                        <div class="wish-welcome-icon">✨</div>
+                        <p>Your wishes are my command!</p>
+                        <p class="wish-hint">Speak to the genie or type below</p>
+                    </div>
+                </div>
+                <div class="wish-input-area">
+                    <div class="wish-input-container">
+                        <button id="btn-attach" class="btn-attach" title="Attach file">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+                            </svg>
+                        </button>
+                        <input type="file" id="file-input" style="display:none"
+                            accept="image/*,audio/*,video/*,.pdf,.txt,.md,.csv,.json,.xml,.html,.xlsx,.xls,.doc,.docx,.pptx">
+                        <input type="text" id="wish-input" placeholder="Type your wish..." autocomplete="off">
+                        <button id="btn-send-wish" class="btn-send" title="Send">▶</button>
+                    </div>
+                    <div id="file-preview" class="file-preview" style="display:none"></div>
+                    <div class="wish-input-actions">
+                        <button id="btn-screenshot" class="action-btn">📸 Screen</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TASKS Section -->
+            <div id="section-tasks" class="section">
+                <div id="task-list" class="task-list">
+                    <div class="task-empty">
+                        <div class="task-empty-icon">📋</div>
+                        <p>No tasks yet</p>
+                        <p style="font-size:10px; opacity:0.5; margin-top:4px;">Ask the genie or add below</p>
+                    </div>
+                </div>
+                <div class="wish-input-area">
+                    <div class="wish-input-container">
+                        <input type="text" id="task-input" placeholder="Add a task... e.g. Check WhatsApp daily"
+                            autocomplete="off">
+                        <button id="btn-add-task" class="btn-send" title="Add task">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTACTS Section -->
+            <div id="section-contacts" class="section">
+                <div class="contacts-section">
+                    <h3>📇 WhatsApp Contacts</h3>
+                    <div class="contact-add-form">
+                        <input type="text" id="contact-name-input" placeholder="Name">
+                        <input type="text" id="contact-phone-input" placeholder="+880...">
+                        <button id="btn-add-contact">+ Add</button>
+                    </div>
+                    <div id="contacts-list">
+                        <div class="contact-empty">No contacts saved yet.<br><span
+                                style="font-size:10px;opacity:0.5">Add
+                                contacts so the genie can message them instantly!</span></div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+                        <div id="contacts-path" class="contacts-path" style="flex:1; margin-top:0;"></div>
+                        <button id="btn-open-contacts-folder"
+                            style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.6); padding:4px 10px; border-radius:6px; cursor:pointer; font-size:10px; white-space:nowrap;">📂
+                            Open Folder</button>
+                    </div>
+                    <div style="font-size:10px; color:rgba(180,160,255,0.35); margin-top:6px;">🔒 Encrypted locally on
+                        this
+                        machine only. Never uploaded.</div>
+                </div>
+            </div>
+
+            <!-- SETTINGS Section -->
+            <div id="section-settings" class="section">
+                <div class="settings-section">
+                    <h3>⚙️ Settings</h3>
+
+                    <!-- API Mode -->
+                    <div class="setting-row">
+                        <label>🔑 API Mode</label>
+                        <select id="setting-api-mode"
+                            style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:6px; padding:4px 8px; color:#e0e0ff; font-size:11px; outline:none; width:150px;">
+                            <option value="custom">🔧 Custom API Key</option>
+                            <option value="credits">💳 WishCraft Credits</option>
+                        </select>
+                    </div>
+
+                    <!-- API Key (shown when mode = custom) -->
+                    <div id="api-key-section">
+                        <div class="setting-row">
+                            <label>🔑 Gemini API Key</label>
+                            <div style="display:flex; gap:6px; align-items:center; flex:1;">
+                                <input type="password" id="setting-api-key" placeholder="Enter your API key..."
+                                    style="flex:1; background:rgba(0,0,0,0.3); border:1px solid rgba(100,200,255,0.2); color:#fff; padding:6px 10px; border-radius:6px; font-size:12px; font-family:monospace;">
+                                <button id="btn-toggle-key"
+                                    style="background:rgba(100,200,255,0.1); border:1px solid rgba(100,200,255,0.2); color:rgba(200,220,255,0.7); padding:6px 8px; border-radius:6px; cursor:pointer; font-size:12px;">👁️</button>
+                            </div>
+                        </div>
+                        <div id="api-key-status"
+                            style="font-size:10px; color:rgba(100,255,100,0.5); margin:-6px 0 8px 0; padding-left:2px;">
+                        </div>
+                    </div>
+
+                    <!-- Credits Info (shown when mode = credits) -->
+                    <div id="credits-section" style="display:none;">
+                        <div class="setting-row">
+                            <label>💳 Credit Balance</label>
+                            <span id="credits-balance"
+                                style="color:rgba(255,255,255,0.6); font-size:14px; font-weight:600;">0
+                                credits</span>
+                        </div>
+                        <div style="font-size:10px; color:rgba(180,160,255,0.4); margin:-6px 0 8px 0;">Uses WishCraft
+                            server
+                            API key. Credits deducted per session.</div>
+                        <button id="btn-buy-credits" class="btn-apply"
+                            style="width:100%; margin:4px 0 8px 0; background:linear-gradient(135deg, rgba(130,80,255,0.4), rgba(80,120,255,0.4)); border:1px solid rgba(130,80,255,0.3);">💎
+                            Buy Credits</button>
+
+                        <!-- Credit Purchase Modal (inline) -->
+                        <div id="credit-purchase-modal" style="display:none;">
+                            <div
+                                style="font-size:11px; color:rgba(255,255,255,0.7); font-weight:600; margin:8px 0 6px;">
+                                Choose a package:</div>
+                            <div id="credit-packages" style="display:flex; flex-direction:column; gap:6px;"></div>
+
+                            <div id="stripe-card-section" style="display:none; margin-top:10px;">
+                                <div style="font-size:11px; color:rgba(255,255,255,0.6); margin:0 0 6px;">Card Details
+                                </div>
+                                <div id="wishcraft-card-element"
+                                    style="background:rgba(0,0,0,0.3); border:1px solid rgba(130,80,255,0.25); border-radius:6px; padding:10px;">
+                                </div>
+                                <div id="wishcraft-card-errors"
+                                    style="font-size:10px; color:rgba(255,100,100,0.7); margin:4px 0;"></div>
+                                <button id="btn-pay-now" class="btn-apply"
+                                    style="width:100%; margin:6px 0; background:linear-gradient(135deg, rgba(50,200,100,0.5), rgba(30,160,80,0.5)); border:1px solid rgba(50,200,100,0.3);">🔒
+                                    Pay Now</button>
+                            </div>
+                            <div id="purchase-status"
+                                style="font-size:10px; color:rgba(255,255,255,0.4); margin:4px 0;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Storage Mode -->
+                    <div style="border-top:1px solid rgba(255,255,255,0.1); margin:12px 0; padding-top:12px;"></div>
+                    <div class="setting-row">
+                        <label>☁️ Storage</label>
+                        <select id="setting-storage-mode"
+                            style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:6px; padding:4px 8px; color:#e0e0ff; font-size:11px; outline:none; width:150px;">
+                            <option value="offline">🔒 Offline Only</option>
+                            <option value="online">☁️ Cloud Sync</option>
+                        </select>
+                    </div>
+                    <div id="storage-info" style="font-size:10px; color:rgba(180,160,255,0.35); margin:-6px 0 8px 0;">
+                        All
+                        data stored locally in ~/.wishcraft/ (encrypted).</div>
+
+                    <!-- Cloud Sync Controls (shown when storage = online) -->
+                    <div id="cloud-sync-section" style="display:none;">
+                        <div class="setting-row">
+                            <label>🌐 Server URL</label>
+                            <input type="text" id="setting-server-url" value="https://wishcraft-server-47389095635.us-central1.run.app"
+                                style="flex:1; background:rgba(0,0,0,0.3); border:1px solid rgba(100,200,255,0.2); color:#fff; padding:6px 10px; border-radius:6px; font-size:11px; font-family:monospace;">
+                        </div>
+                        <div style="display:flex; gap:8px; margin:8px 0;">
+                            <button id="btn-cloud-sync" class="btn-apply" style="flex:1; margin:0;">☁️
+                                Sync to Cloud</button>
+                            <button id="btn-cloud-restore" class="btn-apply" style="flex:1; margin:0;">⬇
+                                Restore from Cloud</button>
+                        </div>
+                        <div id="cloud-sync-status" style="font-size:10px; color:rgba(255,255,255,0.4); margin:4px 0;">
+                        </div>
+                    </div>
+
+                    <!-- General Settings -->
+                    <div style="border-top:1px solid rgba(255,255,255,0.1); margin:12px 0; padding-top:12px;"></div>
+
+                    <!-- User Name -->
+                    <div class="setting-row">
+                        <label>👤 Your Name</label>
+                        <input type="text" id="setting-username" placeholder="Enter your name..."
+                            style="width:150px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:6px; padding:4px 8px; color:#e0e0ff; font-size:11px; outline:none;">
+                    </div>
+
+                    <!-- Language -->
+                    <div class="setting-row">
+                        <label>🗣️ Language</label>
+                        <select id="setting-lang">
+                            <option value="en">🇬🇧 English</option>
+                            <option value="bn">🇧🇩 বাংলা</option>
+                            <option value="hi">🇮🇳 हिन्दी</option>
+                            <option value="ar">🇸🇦 العربية</option>
+                            <option value="es">🇪🇸 Español</option>
+                            <option value="zh">🇨🇳 中文</option>
+                            <option value="ja">🇯🇵 日本語</option>
+                            <option value="fr">🇫🇷 Français</option>
+                            <option value="af">🇿🇦 Afrikaans</option>
+                            <option value="sq">🇦🇱 Shqip</option>
+                            <option value="am">🇪🇹 አማርኛ</option>
+                            <option value="hy">🇦🇲 Հայերեն</option>
+                            <option value="as">🇮🇳 অসমীয়া</option>
+                            <option value="az">🇦🇿 Azərbaycan</option>
+                            <option value="eu">🇪🇸 Euskara</option>
+                            <option value="be">🇧🇾 Беларуская</option>
+                            <option value="bs">🇧🇦 Bosanski</option>
+                            <option value="bg">🇧🇬 Български</option>
+                            <option value="ca">🇪🇸 Català</option>
+                            <option value="hr">🇭🇷 Hrvatski</option>
+                            <option value="cs">🇨🇿 Čeština</option>
+                            <option value="da">🇩🇰 Dansk</option>
+                            <option value="nl">🇳🇱 Nederlands</option>
+                            <option value="et">🇪🇪 Eesti</option>
+                            <option value="fil">🇵🇭 Filipino</option>
+                            <option value="fi">🇫🇮 Suomi</option>
+                            <option value="gl">🇪🇸 Galego</option>
+                            <option value="ka">🇬🇪 ქართული</option>
+                            <option value="de">🇩🇪 Deutsch</option>
+                            <option value="el">🇬🇷 Ελληνικά</option>
+                            <option value="gu">🇮🇳 ગુજરાતી</option>
+                            <option value="iw">🇮🇱 עברית</option>
+                            <option value="hu">🇭🇺 Magyar</option>
+                            <option value="is">🇮🇸 Íslenska</option>
+                            <option value="id">🇮🇩 Bahasa Indonesia</option>
+                            <option value="it">🇮🇹 Italiano</option>
+                            <option value="kn">🇮🇳 ಕನ್ನಡ</option>
+                            <option value="kk">🇰🇿 Қазақ</option>
+                            <option value="km">🇰🇭 ខ្មែរ</option>
+                            <option value="ko">🇰🇷 한국어</option>
+                            <option value="lo">🇱🇦 ລາວ</option>
+                            <option value="lv">🇱🇻 Latviešu</option>
+                            <option value="lt">🇱🇹 Lietuvių</option>
+                            <option value="mk">🇲🇰 Македонски</option>
+                            <option value="ms">🇲🇾 Bahasa Melayu</option>
+                            <option value="ml">🇮🇳 മലയാളം</option>
+                            <option value="mr">🇮🇳 मराठी</option>
+                            <option value="mn">🇲🇳 Монгол</option>
+                            <option value="ne">🇳🇵 नेपाली</option>
+                            <option value="no">🇳🇴 Norsk</option>
+                            <option value="or">🇮🇳 ଓଡ଼ିଆ</option>
+                            <option value="pl">🇵🇱 Polski</option>
+                            <option value="pt">🇵🇹 Português</option>
+                            <option value="pa">🇮🇳 ਪੰਜਾਬੀ</option>
+                            <option value="ro">🇷🇴 Română</option>
+                            <option value="ru">🇷🇺 Русский</option>
+                            <option value="sr">🇷🇸 Српски</option>
+                            <option value="sk">🇸🇰 Slovenčina</option>
+                            <option value="sl">🇸🇮 Slovenščina</option>
+                            <option value="sw">🇰🇪 Kiswahili</option>
+                            <option value="sv">🇸🇪 Svenska</option>
+                            <option value="ta">🇮🇳 தமிழ்</option>
+                            <option value="te">🇮🇳 తెలుగు</option>
+                            <option value="th">🇹🇭 ไทย</option>
+                            <option value="tr">🇹🇷 Türkçe</option>
+                            <option value="uk">🇺🇦 Українська</option>
+                            <option value="ur">🇵🇰 اردو</option>
+                            <option value="uz">🇺🇿 O'zbek</option>
+                            <option value="vi">🇻🇳 Tiếng Việt</option>
+                            <option value="zu">🇿🇦 isiZulu</option>
+                        </select>
+                    </div>
+                    <div class="setting-row">
+                        <label>🧞 Avatar</label>
+                        <select id="setting-avatar">
+                            <option value="male">🧞‍♂️ Male Genie</option>
+                            <option value="female">🧞‍♀️ Female Genie</option>
+                        </select>
+                    </div>
+                    <div class="setting-row">
+                        <label>🎙️ Voice</label>
+                        <select id="setting-voice">
+                            <optgroup label="Male Voices">
+                                <option value="Charon">Charon (Male)</option>
+                                <option value="Fenrir">Fenrir (Male)</option>
+                                <option value="Orus">Orus (Male)</option>
+                                <option value="Puck">Puck (Male)</option>
+                            </optgroup>
+                            <optgroup label="Female Voices">
+                                <option value="Aoede">Aoede (Female)</option>
+                                <option value="Kore">Kore (Female)</option>
+                                <option value="Leda">Leda (Female)</option>
+                                <option value="Zephyr">Zephyr (Female)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <button id="btn-apply" class="btn-apply">✨ Apply & Save Changes</button>
+                    <div style="font-size:10px; color:rgba(180,160,255,0.35); margin-top:8px;">🔒 All data encrypted
+                        with
+                        AES-256-GCM. Custom API keys never leave your machine.</div>
+                </div>
+            </div>
+
+        </div><!-- end .glass-content -->
+
+        <!-- Chat History Overlay (absolute positioned over glass-panel) -->
+        <div id="history-overlay" class="history-overlay">
+            <div class="history-header">
+                <h3>📜 Chat History</h3>
+                <div class="history-actions">
+                    <button id="btn-new-chat-overlay" class="btn-new-chat">+ New Chat</button>
+                    <button id="btn-close-history" class="btn-close-history">✕</button>
+                </div>
+            </div>
+            <div id="history-list" class="history-list">
+                <div class="history-empty">
+                    <div class="history-empty-icon">💬</div>
+                    <p>No conversations yet</p>
+                    <p style="font-size:10px; opacity:0.5; margin-top:4px;">Start chatting with the genie!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const wishChat = document.getElementById('wish-chat');
+        const wishInput = document.getElementById('wish-input');
+        const activeWish = document.getElementById('active-wish');
+        const activeWishText = document.getElementById('active-wish-text');
+        const statusDot = document.querySelector('.status-dot');
+        const statusText = document.getElementById('status-text');
+        const taskListEl = document.getElementById('task-list');
+
+        // ============================================
+        // Tab switching
+        // ============================================
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('section-' + btn.dataset.section).classList.add('active');
+            });
+        });
+
+        // Show specific section (from main process)
+        if (window.wishcraft.onShowSection) {
+            // Not available yet via preload, use ipcRenderer listener
+        }
+        // Listen for show-section from main
+        const { ipcRenderer } = window.wishcraft._ipc || {};
+
+        // ============================================
+        // Chat History (encrypted conversation persistence)
+        // ============================================
+        let currentConversationId = null;
+
+        async function ensureConversation() {
+            if (!currentConversationId) {
+                currentConversationId = await window.wishcraft.chatHistory.create('New Chat');
+            }
+            return currentConversationId;
+        }
+
+        async function saveMessage(role, text) {
+            const convId = await ensureConversation();
+            await window.wishcraft.chatHistory.addMessage(convId, role, text);
+        }
+
+        function getTimeGroup(dateStr) {
+            const d = new Date(dateStr);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+            const weekAgo = new Date(today); weekAgo.setDate(today.getDate() - 7);
+            const monthAgo = new Date(today); monthAgo.setDate(today.getDate() - 30);
+            if (d >= today) return 'Today';
+            if (d >= yesterday) return 'Yesterday';
+            if (d >= weekAgo) return 'Previous 7 Days';
+            if (d >= monthAgo) return 'Previous 30 Days';
+            return 'Older';
+        }
+
+        const historyOverlay = document.getElementById('history-overlay');
+        const historyListEl = document.getElementById('history-list');
+
+        async function renderHistoryList() {
+            const conversations = await window.wishcraft.chatHistory.list();
+            if (!conversations || conversations.length === 0) {
+                historyListEl.innerHTML = '<div class="history-empty"><div class="history-empty-icon">💬</div><p>No conversations yet</p><p style="font-size:10px;opacity:0.5;margin-top:4px">Start chatting with the genie!</p></div>';
+                return;
+            }
+            historyListEl.innerHTML = '';
+            let lastGroup = '';
+            conversations.forEach(conv => {
+                const group = getTimeGroup(conv.updated);
+                if (group !== lastGroup) {
+                    lastGroup = group;
+                    const label = document.createElement('div');
+                    label.className = 'history-group-label';
+                    label.textContent = group;
+                    historyListEl.appendChild(label);
+                }
+                const item = document.createElement('div');
+                item.className = 'history-item' + (conv.id === currentConversationId ? ' active' : '');
+                item.innerHTML =
+                    '<div class="history-item-title">' + escapeHtml(conv.title) + '</div>' +
+                    '<span class="history-item-meta">' + conv.messageCount + '</span>' +
+                    '<button class="history-item-delete" data-id="' + conv.id + '" title="Delete">✕</button>';
+                item.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('history-item-delete')) return;
+                    loadConversation(conv.id);
+                });
+                historyListEl.appendChild(item);
+            });
+            historyListEl.querySelectorAll('.history-item-delete').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id;
+                    await window.wishcraft.chatHistory.delete(id);
+                    if (id === currentConversationId) {
+                        currentConversationId = null;
+                        clearChatUI();
+                    }
+                    renderHistoryList();
+                });
+            });
+        }
+
+        async function loadConversation(id) {
+            const conv = await window.wishcraft.chatHistory.get(id);
+            if (!conv) return;
+            currentConversationId = id;
+            wishChat.innerHTML = '';
+            conv.messages.forEach(msg => {
+                const bubble = document.createElement('div');
+                bubble.className = 'wish-bubble ' + msg.role;
+                const time = new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                bubble.innerHTML = escapeHtml(msg.text) + '<span class="wish-time">' + time + '</span>';
+                wishChat.appendChild(bubble);
+            });
+            if (conv.messages.length === 0) showWelcome();
+            wishChat.scrollTop = wishChat.scrollHeight;
+            historyOverlay.classList.remove('visible');
+            document.querySelector('.tab-btn[data-section="chat"]').click();
+        }
+
+        function clearChatUI() {
+            wishChat.innerHTML = '';
+            showWelcome();
+        }
+
+        function showWelcome() {
+            wishChat.innerHTML = '<div class="wish-welcome"><div class="wish-welcome-icon">✨</div><p>Your wishes are my command!</p><p class="wish-hint">Speak to the genie or type below</p></div>';
+        }
+
+        async function startNewChat() {
+            currentConversationId = null;
+            clearChatUI();
+            historyOverlay.classList.remove('visible');
+            document.querySelector('.tab-btn[data-section="chat"]').click();
+        }
+
+        // Load most recent conversation on startup
+        (async () => {
+            try {
+                const convs = await window.wishcraft.chatHistory.list();
+                if (convs && convs.length > 0) {
+                    await loadConversation(convs[0].id);
+                }
+            } catch (e) { console.warn('Chat history load:', e); }
+        })();
+
+        // History button handlers
+        document.getElementById('btn-history').addEventListener('click', () => {
+            renderHistoryList();
+            historyOverlay.classList.toggle('visible');
+        });
+        document.getElementById('btn-close-history').addEventListener('click', () => {
+            historyOverlay.classList.remove('visible');
+        });
+        document.getElementById('btn-new-chat-overlay').addEventListener('click', startNewChat);
+        document.getElementById('btn-new-chat-header').addEventListener('click', startNewChat);
+
+        // ============================================
+        // Chat
+        // ============================================
+        function addBubble(text, type = 'user') {
+            const welcome = wishChat.querySelector('.wish-welcome');
+            if (welcome) welcome.remove();
+            const bubble = document.createElement('div');
+            bubble.className = 'wish-bubble ' + type;
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            bubble.innerHTML = escapeHtml(text) + '<span class="wish-time">' + time + '</span>';
+            wishChat.appendChild(bubble);
+            wishChat.scrollTop = wishChat.scrollHeight;
+            saveMessage(type, text);
+        }
+        function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+        // File upload state (used by sendWish and file upload handlers)
+        let pendingFile = null;
+
+        function sendWish() {
+            const text = wishInput.value.trim();
+            const file = pendingFile;
+            if (!text && !file) return;
+
+            if (file) {
+                // File upload mode
+                const message = text || 'Analyze this file';
+                wishInput.value = '';
+                const ext = '.' + file.name.split('.').pop().toLowerCase();
+                const isImage = file.type.startsWith('image/');
+
+                // Custom bubble with attachment
+                const welcome = wishChat.querySelector('.wish-welcome');
+                if (welcome) welcome.remove();
+                const bubble = document.createElement('div');
+                bubble.className = 'wish-bubble user';
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                let attachHtml = '<div class="file-attachment">';
+                if (isImage) {
+                    attachHtml += '<img src="' + URL.createObjectURL(file) + '">';
+                } else {
+                    attachHtml += '<span>' + getFileIcon(ext) + '</span>';
+                }
+                attachHtml += '<span>' + escapeHtml(file.name) + '</span></div>';
+                bubble.innerHTML = escapeHtml(message) + attachHtml + '<span class="wish-time">' + time + '</span>';
+                wishChat.appendChild(bubble);
+                wishChat.scrollTop = wishChat.scrollHeight;
+
+                // Read file as base64 and send to avatar
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result.split(',')[1];
+                    window.wishcraft.sendToAvatar({
+                        type: 'send-file',
+                        fileName: file.name,
+                        mimeType: file.type || 'application/octet-stream',
+                        base64: base64,
+                        size: file.size,
+                        message: message
+                    });
+                };
+                reader.readAsDataURL(file);
+                clearFilePreview();
+            } else {
+                // Normal text mode
+                wishInput.value = '';
+                addBubble(text, 'user');
+                window.wishcraft.sendToAvatar({ type: 'send-text', text });
+            }
+        }
+        wishInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendWish(); });
+        document.getElementById('btn-send-wish').addEventListener('click', sendWish);
+        document.getElementById('btn-screenshot').addEventListener('click', () => {
+            window.wishcraft.sendToAvatar({ type: 'send-screenshot' });
+            addBubble('📸 Sent screenshot', 'system');
+        });
+
+        // ============================================
+        // File Upload
+        // ============================================
+        const fileInput = document.getElementById('file-input');
+        const btnAttach = document.getElementById('btn-attach');
+        const filePreview = document.getElementById('file-preview');
+
+        // File type icons
+        function getFileIcon(ext) {
+            const icons = {
+                '.pdf': '📄', '.txt': '📝', '.md': '📝', '.csv': '📊', '.json': '{ }',
+                '.xml': '📋', '.html': '🌐', '.htm': '🌐',
+                '.mp3': '🎵', '.wav': '🎵', '.m4a': '🎵', '.ogg': '🎵',
+                '.aac': '🎵', '.flac': '🎵', '.wma': '🎵', '.webm': '🎵',
+                '.mp4': '🎬', '.mov': '🎬', '.avi': '🎬', '.mkv': '🎬',
+                '.xlsx': '📊', '.xls': '📊', '.doc': '📄', '.docx': '📄', '.pptx': '📊'
+            };
+            return icons[ext] || '📎';
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function getFileType(mimeType) {
+            if (mimeType.startsWith('image/')) return 'image';
+            if (mimeType.startsWith('audio/') || mimeType.startsWith('video/')) return 'audio';
+            return 'document';
+        }
+
+        // Click attach button → open file picker
+        btnAttach.addEventListener('click', () => fileInput.click());
+
+        // File selected
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) showFilePreview(file);
+            fileInput.value = ''; // reset so same file can be re-selected
+        });
+
+        function showFilePreview(file) {
+            if (file.size > 20 * 1024 * 1024) {
+                addBubble('File too large (max 20MB)', 'system');
+                return;
+            }
+            pendingFile = file;
+            const ext = '.' + file.name.split('.').pop().toLowerCase();
+            const isImage = file.type.startsWith('image/');
+
+            let thumbHtml;
+            if (isImage) {
+                const url = URL.createObjectURL(file);
+                thumbHtml = '<img class="file-preview-thumb" src="' + url + '">';
+            } else {
+                thumbHtml = '<div class="file-preview-icon">' + getFileIcon(ext) + '</div>';
+            }
+
+            filePreview.innerHTML = thumbHtml +
+                '<div class="file-preview-info">' +
+                '  <div class="file-preview-name">' + escapeHtml(file.name) + '</div>' +
+                '  <div class="file-preview-size">' + formatSize(file.size) + '</div>' +
+                '</div>' +
+                '<button class="file-preview-remove" title="Remove">✕</button>';
+            filePreview.style.display = 'flex';
+            btnAttach.classList.add('has-file');
+
+            filePreview.querySelector('.file-preview-remove').addEventListener('click', clearFilePreview);
+            wishInput.placeholder = 'Add a message or press send...';
+            wishInput.focus();
+        }
+
+        function clearFilePreview() {
+            pendingFile = null;
+            filePreview.style.display = 'none';
+            filePreview.innerHTML = '';
+            btnAttach.classList.remove('has-file');
+            wishInput.placeholder = 'Type your wish...';
+        }
+
+        // Drag and drop on chat area
+        const wishChatEl = document.getElementById('wish-chat');
+        wishChatEl.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            wishChatEl.classList.add('drag-over');
+        });
+        wishChatEl.addEventListener('dragleave', () => wishChatEl.classList.remove('drag-over'));
+        wishChatEl.addEventListener('drop', (e) => {
+            e.preventDefault();
+            wishChatEl.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file) showFilePreview(file);
+        });
+
+        // ============================================
+        // Task List
+        // ============================================
+        function renderTasks(tasks) {
+            if (!tasks || tasks.length === 0) {
+                taskListEl.innerHTML = '<div class="task-empty"><div class="task-empty-icon">📋</div><p>No tasks yet</p><p style="font-size:10px;opacity:0.5;margin-top:4px">Ask the genie to add tasks</p></div>';
+                return;
+            }
+            taskListEl.innerHTML = '';
+            tasks.forEach((task, i) => {
+                const item = document.createElement('div');
+                item.className = 'task-item';
+                item.innerHTML = '<div class="task-name">' + escapeHtml(task.name) + '</div>' +
+                    (task.schedule ? '<span class="task-schedule">' + escapeHtml(task.schedule) + '</span>' : '') +
+                    '<button class="task-remove" data-index="' + i + '" title="Remove">✕</button>';
+                taskListEl.appendChild(item);
+            });
+            // Remove buttons
+            taskListEl.querySelectorAll('.task-remove').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    window.wishcraft.sendToAvatar({ type: 'remove-task', index: parseInt(btn.dataset.index) });
+                });
+            });
+        }
+
+        // Manual add task
+        document.getElementById('btn-add-task').addEventListener('click', addManualTask);
+        document.getElementById('task-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') addManualTask(); });
+        function addManualTask() {
+            const input = document.getElementById('task-input');
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+            // Send to avatar to add to task list
+            window.wishcraft.sendToAvatar({ type: 'add-task-manual', name: text, schedule: 'daily' });
+            addBubble('📋 Added: ' + text, 'system');
+        }
+
+        // ============================================
+        // Settings
+        // ============================================
+        const apiKeyInput = document.getElementById('setting-api-key');
+        const apiKeyStatus = document.getElementById('api-key-status');
+        const btnToggleKey = document.getElementById('btn-toggle-key');
+        const apiModeSelect = document.getElementById('setting-api-mode');
+        const storageModeSelect = document.getElementById('setting-storage-mode');
+        const apiKeySection = document.getElementById('api-key-section');
+        const creditsSection = document.getElementById('credits-section');
+        const cloudSyncSection = document.getElementById('cloud-sync-section');
+        const storageInfo = document.getElementById('storage-info');
+        const cloudSyncStatus = document.getElementById('cloud-sync-status');
+
+        // Toggle API mode sections
+        function updateApiModeUI(mode) {
+            if (mode === 'credits') {
+                apiKeySection.style.display = 'none';
+                creditsSection.style.display = 'block';
+            } else {
+                apiKeySection.style.display = 'block';
+                creditsSection.style.display = 'none';
+            }
+        }
+
+        // Toggle storage mode sections
+        function updateStorageModeUI(mode) {
+            if (mode === 'online') {
+                cloudSyncSection.style.display = 'block';
+                storageInfo.textContent = 'Data synced to Google Cloud Storage (encrypted).';
+            } else {
+                cloudSyncSection.style.display = 'none';
+                storageInfo.textContent = 'All data stored locally in ~/.wishcraft/ (encrypted).';
+            }
+        }
+
+        apiModeSelect.addEventListener('change', () => updateApiModeUI(apiModeSelect.value));
+        storageModeSelect.addEventListener('change', () => updateStorageModeUI(storageModeSelect.value));
+
+        // Cloud sync buttons
+        document.getElementById('btn-cloud-sync').addEventListener('click', async () => {
+            cloudSyncStatus.textContent = '☁️ Syncing to cloud...';
+            cloudSyncStatus.style.color = 'rgba(255,255,255,0.4)';
+            try {
+                const result = await window.wishcraft.cloud.syncAll();
+                cloudSyncStatus.textContent = '✅ Synced: ' + Object.keys(result).filter(k => result[k].success).join(', ');
+                cloudSyncStatus.style.color = 'rgba(100,255,100,0.5)';
+            } catch (e) {
+                cloudSyncStatus.textContent = '❌ Sync failed: ' + e.message;
+                cloudSyncStatus.style.color = 'rgba(255,100,100,0.5)';
+            }
+        });
+
+        document.getElementById('btn-cloud-restore').addEventListener('click', async () => {
+            cloudSyncStatus.textContent = '⬇ Restoring from cloud...';
+            cloudSyncStatus.style.color = 'rgba(255,255,255,0.4)';
+            try {
+                const result = await window.wishcraft.cloud.restoreAll();
+                cloudSyncStatus.textContent = '✅ Restored: ' + Object.keys(result).filter(k => result[k].success).join(', ');
+                cloudSyncStatus.style.color = 'rgba(100,255,100,0.5)';
+            } catch (e) {
+                cloudSyncStatus.textContent = '❌ Restore failed: ' + e.message;
+                cloudSyncStatus.style.color = 'rgba(255,100,100,0.5)';
+            }
+        });
+
+        // Credit Purchase System (Stripe Test Mode)
+        let stripeInstance = null;
+        let stripeCardElement = null;
+        let selectedPackage = null;
+
+        document.getElementById('btn-buy-credits').addEventListener('click', async () => {
+            const modal = document.getElementById('credit-purchase-modal');
+            if (modal.style.display === 'none') {
+                modal.style.display = 'block';
+                await loadCreditPackages();
+            } else {
+                modal.style.display = 'none';
+            }
+        });
+
+        async function loadCreditPackages() {
+            const container = document.getElementById('credit-packages');
+            container.innerHTML = '<div style="color:rgba(255,255,255,0.4); font-size:10px;">Loading packages...</div>';
+            try {
+                const serverUrl = await window.wishcraft.getServerUrl();
+                const resp = await fetch(serverUrl + '/api/credits/packages');
+                const data = await resp.json();
+                container.innerHTML = '';
+                for (const [key, pkg] of Object.entries(data.packages)) {
+                    const card = document.createElement('div');
+                    card.style.cssText = 'background:rgba(130,80,255,0.1); border:1px solid rgba(130,80,255,0.2); border-radius:8px; padding:8px 10px; cursor:pointer; transition:all 0.2s;';
+                    card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div><span style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.85);">${pkg.name}</span>
+                        <span style="font-size:10px; color:rgba(130,180,255,0.5); margin-left:4px;">(+${pkg.bonus} bonus)</span></div>
+                        <span style="font-size:13px; font-weight:700; color:rgba(100,255,180,0.8);">$${pkg.price}</span></div>`;
+                    card.addEventListener('click', function() { selectPackage(key, pkg, container, this); });
+                    card.addEventListener('mouseenter', function() { this.style.borderColor = 'rgba(130,80,255,0.5)'; this.style.background = 'rgba(130,80,255,0.2)'; });
+                    card.addEventListener('mouseleave', function() {
+                        if (selectedPackage !== key) { this.style.borderColor = 'rgba(130,80,255,0.2)'; this.style.background = 'rgba(130,80,255,0.1)'; }
+                    });
+                    container.appendChild(card);
+                }
+            } catch (e) {
+                container.innerHTML = '<div style="color:rgba(255,100,100,0.6); font-size:10px;">Server unavailable. Start the WishCraft server first.</div>';
+            }
+        }
+
+        function selectPackage(key, pkg, container, el) {
+            selectedPackage = key;
+            Array.from(container.children).forEach(c => { c.style.borderColor = 'rgba(130,80,255,0.2)'; c.style.background = 'rgba(130,80,255,0.1)'; });
+            el.style.borderColor = 'rgba(100,255,180,0.5)';
+            el.style.background = 'rgba(130,80,255,0.25)';
+            document.getElementById('stripe-card-section').style.display = 'block';
+            document.getElementById('btn-pay-now').textContent = '\uD83D\uDD12 Pay $' + pkg.price;
+            if (!stripeInstance) initStripe();
+        }
+
+        function initStripe() {
+            if (stripeInstance) return;
+            const script = document.createElement('script');
+            script.src = 'https://js.stripe.com/v3/';
+            script.onload = () => {
+                stripeInstance = Stripe('pk_test_51SicWpAbfnWorjnyMtW553chKp85slEzScGIAN8uD7dUHBMjWhVtjV4PVkGihgZiIoWIG14CYaiLgCXtvtsnlxgq00CiygjUNf');
+                const elements = stripeInstance.elements();
+                stripeCardElement = elements.create('card', {
+                    style: { base: { color: '#e0e0ff', fontSize: '13px', '::placeholder': { color: 'rgba(200,200,255,0.3)' } }, invalid: { color: '#ff6b6b' } }
+                });
+                stripeCardElement.mount('#wishcraft-card-element');
+                stripeCardElement.on('change', (ev) => {
+                    document.getElementById('wishcraft-card-errors').textContent = ev.error ? ev.error.message : '';
+                });
+            };
+            document.head.appendChild(script);
+        }
+
+        document.getElementById('btn-pay-now').addEventListener('click', async () => {
+            if (!selectedPackage || !stripeInstance || !stripeCardElement) return;
+            const btn = document.getElementById('btn-pay-now');
+            const statusEl = document.getElementById('purchase-status');
+            btn.disabled = true;
+            btn.textContent = '⏳ Processing...';
+            statusEl.textContent = '';
+            try {
+                const { paymentMethod, error } = await stripeInstance.createPaymentMethod({ type: 'card', card: stripeCardElement });
+                if (error) {
+                    statusEl.textContent = '❌ ' + error.message;
+                    statusEl.style.color = 'rgba(255,100,100,0.7)';
+                    btn.disabled = false; btn.textContent = '🔒 Pay Now'; return;
+                }
+                const serverUrl = await window.wishcraft.getServerUrl();
+                const deviceId = await window.wishcraft.cloud.getDeviceId();
+                const resp = await fetch(serverUrl + '/api/credits/purchase', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ deviceId, packageId: selectedPackage, paymentMethodId: paymentMethod.id })
+                });
+                const result = await resp.json();
+                if (result.success) {
+                    statusEl.textContent = '✅ ' + result.message;
+                    statusEl.style.color = 'rgba(100,255,100,0.7)';
+                    document.getElementById('credits-balance').textContent = result.newBalance + ' credits';
+                    document.getElementById('credit-purchase-modal').style.display = 'none';
+                    addBubble('💎 Purchased ' + result.creditsAdded + ' credits!', 'system');
+                } else {
+                    statusEl.textContent = '❌ ' + (result.error || 'Purchase failed');
+                    statusEl.style.color = 'rgba(255,100,100,0.7)';
+                }
+            } catch (e) {
+                statusEl.textContent = '❌ Connection failed';
+                statusEl.style.color = 'rgba(255,100,100,0.7)';
+            }
+            btn.disabled = false; btn.textContent = '🔒 Pay Now';
+        });
+
+        async function loadCreditBalance() {
+            try {
+                const serverUrl = await window.wishcraft.getServerUrl();
+                const deviceId = await window.wishcraft.cloud.getDeviceId();
+                const resp = await fetch(serverUrl + '/api/credits/balance?deviceId=' + deviceId);
+                const data = await resp.json();
+                if (data.credits !== undefined) document.getElementById('credits-balance').textContent = data.credits + ' credits';
+            } catch (e) { /* server offline */ }
+        }
+
+        // Load saved settings on start
+        (async () => {
+            // API key status
+            const hasKey = await window.wishcraft.hasApiKey();
+            if (hasKey) {
+                apiKeyInput.placeholder = '••••••••••••••••••••••••••• (saved)';
+                apiKeyStatus.textContent = '✅ API key is saved securely';
+                apiKeyStatus.style.color = 'rgba(100,255,100,0.5)';
+            } else {
+                apiKeyStatus.textContent = '⚠️ No API key set — enter one to get started';
+                apiKeyStatus.style.color = 'rgba(255,200,100,0.5)';
+            }
+
+            // Load persisted settings
+            const savedLang = await window.wishcraft.getSetting('language', 'en');
+            const savedAvatar = await window.wishcraft.getSetting('avatar', 'male');
+            const savedVoice = await window.wishcraft.getSetting('voice', '');
+            const savedName = await window.wishcraft.memory.getUserFact('userName');
+            document.getElementById('setting-lang').value = savedLang;
+            document.getElementById('setting-avatar').value = savedAvatar;
+            document.getElementById('setting-voice').value = savedVoice || (savedAvatar === 'female' ? 'Aoede' : 'Charon');
+            document.getElementById('setting-username').value = savedName || '';
+
+            // First-launch: show settings tab if no name set
+            if (!savedName) {
+                document.querySelector('.tab-btn[data-section="settings"]').click();
+            }
+
+            // Auto-switch voice when avatar changes
+            document.getElementById('setting-avatar').addEventListener('change', () => {
+                const av = document.getElementById('setting-avatar').value;
+                const voiceEl = document.getElementById('setting-voice');
+                const currentVoice = voiceEl.value;
+                const maleVoices = ['Charon', 'Fenrir', 'Orus', 'Puck'];
+                const femaleVoices = ['Aoede', 'Kore', 'Leda', 'Zephyr'];
+                if (av === 'female' && maleVoices.includes(currentVoice)) {
+                    voiceEl.value = 'Aoede';
+                } else if (av === 'male' && femaleVoices.includes(currentVoice)) {
+                    voiceEl.value = 'Charon';
+                }
+            });
+
+            // Load API mode, storage mode, server URL
+            const apiMode = await window.wishcraft.getApiMode();
+            apiModeSelect.value = apiMode;
+            updateApiModeUI(apiMode);
+            if (apiMode === 'credits') loadCreditBalance();
+
+            const storageMode = await window.wishcraft.getStorageMode();
+            storageModeSelect.value = storageMode;
+            updateStorageModeUI(storageMode);
+
+            const serverUrl = await window.wishcraft.getServerUrl();
+            document.getElementById('setting-server-url').value = serverUrl;
+        })();
+
+        // Toggle key visibility
+        btnToggleKey.addEventListener('click', () => {
+            apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
+            btnToggleKey.textContent = apiKeyInput.type === 'password' ? '👁️' : '🙈';
+        });
+
+        document.getElementById('btn-apply').addEventListener('click', async () => {
+            const lang = document.getElementById('setting-lang').value;
+            const avatar = document.getElementById('setting-avatar').value;
+            const voice = document.getElementById('setting-voice').value;
+            const username = document.getElementById('setting-username').value.trim();
+            const newKey = apiKeyInput.value.trim();
+            const apiMode = apiModeSelect.value;
+            const storageMode = storageModeSelect.value;
+            const serverUrl = document.getElementById('setting-server-url').value.trim();
+
+            // Save API key if changed (only in custom mode)
+            if (apiMode === 'custom' && newKey) {
+                const result = await window.wishcraft.setApiKey(newKey);
+                if (result.success) {
+                    apiKeyInput.value = '';
+                    apiKeyInput.placeholder = '••••••••••••••••••••••••••• (saved)';
+                    apiKeyStatus.textContent = '✅ API key saved securely';
+                    apiKeyStatus.style.color = 'rgba(100,255,100,0.5)';
+                } else {
+                    apiKeyStatus.textContent = '❌ Failed to save API key';
+                    apiKeyStatus.style.color = 'rgba(255,100,100,0.5)';
+                }
+            }
+
+            // Save all settings
+            await window.wishcraft.setSetting('language', lang);
+            await window.wishcraft.setSetting('avatar', avatar);
+            await window.wishcraft.setSetting('voice', voice);
+            await window.wishcraft.setSetting('setupComplete', true);
+            if (username) await window.wishcraft.memory.setUserFact('userName', username);
+            await window.wishcraft.setApiMode(apiMode);
+            await window.wishcraft.setStorageMode(storageMode);
+            if (serverUrl) await window.wishcraft.setServerUrl(serverUrl);
+
+            window.wishcraft.sendToAvatar({ type: 'change-lang', lang });
+            window.wishcraft.sendToAvatar({ type: 'change-avatar', avatar });
+            window.wishcraft.sendToAvatar({ type: 'change-voice', voice });
+            window.wishcraft.sendToAvatar({ type: 'change-username', name: username });
+            addBubble('⚙️ Settings saved', 'system');
+
+            // Auto-sync if online mode
+            if (storageMode === 'online') {
+                addBubble('☁️ Syncing to cloud...', 'system');
+                try {
+                    await window.wishcraft.cloud.syncAll();
+                    addBubble('✅ Cloud sync complete', 'system');
+                } catch (e) { /* non-critical */ }
+            }
+
+            // Switch to chat tab
+            document.querySelector('.tab-btn[data-section="chat"]').click();
+        });
+
+        // Close panel
+        document.getElementById('btn-close-panel').addEventListener('click', () => window.wishcraft.closePanel());
+
+        // ============================================
+        // Drag
+        // ============================================
+        let isDragging = false, lastPos = { x: 0, y: 0 };
+        document.getElementById('panel-header').addEventListener('mousedown', (e) => {
+            isDragging = true; lastPos = { x: e.screenX, y: e.screenY };
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) { window.wishcraft.moveWindow(e.screenX - lastPos.x, e.screenY - lastPos.y); lastPos = { x: e.screenX, y: e.screenY }; }
+        });
+        document.addEventListener('mouseup', () => { isDragging = false; });
+
+        // ============================================
+        // Messages from Avatar & Main
+        // ============================================
+        window.wishcraft.onFromAvatar((data) => {
+            switch (data.type) {
+                case 'genie-message': addBubble(data.text, 'genie'); break;
+                case 'user-message': addBubble(data.text, 'user'); break;
+                case 'wish-executing':
+                    activeWishText.textContent = data.text;
+                    activeWish.classList.remove('hidden');
+                    addBubble('🖱️ ' + data.text, 'system');
+                    break;
+                case 'wish-complete':
+                    activeWish.classList.add('hidden');
+                    addBubble('✅ ' + data.text, 'system');
+                    break;
+                case 'status':
+                    statusDot.style.background = data.text === 'connected' ? '#00ff88' : '#ff4444';
+                    statusText.textContent = data.text === 'connected' ? 'Connected' : (data.text === 'error' ? 'Error' : 'Disconnected');
+                    break;
+                case 'lang-changed':
+                    addBubble('🗣️ Language: ' + data.name, 'system');
+                    document.getElementById('setting-lang').value = data.lang;
+                    break;
+                case 'tasks-updated':
+                    renderTasks(data.tasks);
+                    break;
+                case 'task-added':
+                    addBubble('📋 Task added: ' + data.task, 'system');
+                    break;
+                case 'screenshot':
+                    if (data.image) {
+                        const welcome = wishChat.querySelector('.wish-welcome');
+                        if (welcome) welcome.remove();
+                        const label = document.createElement('div');
+                        label.className = 'wish-bubble system';
+                        label.textContent = '📸 Screenshot captured';
+                        wishChat.appendChild(label);
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'screenshot-bubble';
+                        const img = document.createElement('img');
+                        img.src = 'data:image/png;base64,' + data.image;
+                        img.alt = 'Screenshot';
+                        img.addEventListener('click', () => {
+                            const win = window.open();
+                            win.document.write('<img src="' + img.src + '" style="max-width:100%"/>');
+                        });
+                        wrapper.appendChild(img);
+                        wishChat.appendChild(wrapper);
+                        wishChat.scrollTop = wishChat.scrollHeight;
+                        // Switch to chat tab to show it
+                        document.querySelector('.tab-btn[data-section="chat"]').click();
+                    }
+                    break;
+            }
+        });
+
+        // Listen for show-section from main process
+        window.wishcraft.onShowSection && window.wishcraft.onShowSection((section) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const btn = document.querySelector('.tab-btn[data-section="' + section + '"]');
+            if (btn) btn.classList.add('active');
+            const sec = document.getElementById('section-' + section);
+            if (sec) sec.classList.add('active');
+        });
+
+        // ============================================
+        // Contacts
+        // ============================================
+        const contactsListEl = document.getElementById('contacts-list');
+
+        async function loadAndRenderContacts() {
+            try {
+                const contacts = await window.wishcraft.getContacts();
+                renderContacts(contacts);
+                const cPath = await window.wishcraft.getContactsPath();
+                document.getElementById('contacts-path').textContent = '📁 ' + cPath;
+            } catch (e) { console.error('Contacts error:', e); }
+        }
+
+        function renderContacts(contacts) {
+            if (!contacts || contacts.length === 0) {
+                contactsListEl.innerHTML = '<div class="contact-empty">No contacts saved yet.<br><span style="font-size:10px;opacity:0.5">Add contacts so the genie can message them instantly!</span></div>';
+                return;
+            }
+            contactsListEl.innerHTML = '';
+            contacts.forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'contact-item';
+                item.innerHTML = '<span class="contact-name">' + escapeHtml(c.name) + '</span>' +
+                    '<span class="contact-phone">' + escapeHtml(c.phone) + '</span>' +
+                    '<button class="contact-edit" data-name="' + escapeHtml(c.name) + '" data-phone="' + escapeHtml(c.phone) + '" title="Edit" style="background:rgba(255,255,255,0.12);border:1px solid rgba(0,200,255,0.2);color:rgba(0,220,255,0.7);width:22px;height:22px;border-radius:6px;cursor:pointer;font-size:10px;">✎</button>' +
+                    '<button class="contact-remove" data-name="' + escapeHtml(c.name) + '" title="Remove">✕</button>';
+                contactsListEl.appendChild(item);
+            });
+            // Edit buttons — replace row with inline inputs
+            contactsListEl.querySelectorAll('.contact-edit').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const oldName = btn.dataset.name;
+                    const oldPhone = btn.dataset.phone;
+                    const row = btn.parentElement;
+                    row.innerHTML = '<input class="edit-name" value="' + escapeHtml(oldName) + '" style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(0,220,255,0.3);border-radius:5px;padding:4px 6px;color:#e0e0ff;font-size:11px;outline:none;">' +
+                        '<input class="edit-phone" value="' + escapeHtml(oldPhone) + '" style="width:120px;background:rgba(255,255,255,0.08);border:1px solid rgba(0,220,255,0.3);border-radius:5px;padding:4px 6px;color:#e0e0ff;font-size:11px;font-family:monospace;outline:none;">' +
+                        '<button class="edit-save" style="background:rgba(0,200,100,0.15);border:1px solid rgba(0,200,100,0.3);color:rgba(0,220,150,0.8);padding:4px 8px;border-radius:5px;cursor:pointer;font-size:10px;">✓</button>' +
+                        '<button class="edit-cancel" style="background:rgba(255,50,50,0.1);border:1px solid rgba(255,50,50,0.2);color:rgba(255,100,100,0.7);padding:4px 8px;border-radius:5px;cursor:pointer;font-size:10px;">✕</button>';
+                    row.querySelector('.edit-save').addEventListener('click', async () => {
+                        const newName = row.querySelector('.edit-name').value.trim();
+                        const newPhone = row.querySelector('.edit-phone').value.trim();
+                        if (!newName || !newPhone) return;
+                        // Remove old, add new
+                        if (newName.toLowerCase() !== oldName.toLowerCase()) {
+                            await window.wishcraft.removeContact(oldName);
+                        }
+                        await window.wishcraft.addContact(newName, newPhone);
+                        loadAndRenderContacts();
+                    });
+                    row.querySelector('.edit-cancel').addEventListener('click', () => loadAndRenderContacts());
+                    row.querySelector('.edit-name').focus();
+                });
+            });
+            // Remove buttons
+            contactsListEl.querySelectorAll('.contact-remove').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await window.wishcraft.removeContact(btn.dataset.name);
+                    loadAndRenderContacts();
+                });
+            });
+        }
+
+        document.getElementById('btn-add-contact').addEventListener('click', async () => {
+            const nameInput = document.getElementById('contact-name-input');
+            const phoneInput = document.getElementById('contact-phone-input');
+            const name = nameInput.value.trim();
+            const phone = phoneInput.value.trim();
+            if (!name || !phone) return;
+            await window.wishcraft.addContact(name, phone);
+            nameInput.value = '';
+            phoneInput.value = '';
+            loadAndRenderContacts();
+        });
+
+        // Load contacts when contacts tab is shown
+        document.querySelector('.tab-btn[data-section="contacts"]').addEventListener('click', loadAndRenderContacts);
+
+        // Open contacts folder in Finder
+        document.getElementById('btn-open-contacts-folder').addEventListener('click', () => {
+            window.wishcraft.openContactsFolder();
+        });
+
+        console.log('💬 WishCraft Panel ready');
+
+        // ============================================
+        // Mouse-Responsive Border Highlights (Apple Liquid Glass)
+        // Light reflection follows cursor movement
+        // ============================================
+        (function () {
+            const glassPanel = document.querySelector('.glass-panel');
+            const borderScreen = glassPanel.querySelector('.glass-border-screen');
+            const borderOverlay = glassPanel.querySelector('.glass-border-overlay');
+
+            if (!glassPanel || !borderScreen || !borderOverlay) return;
+
+            glassPanel.addEventListener('mousemove', (e) => {
+                const rect = glassPanel.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const offsetX = ((e.clientX - centerX) / rect.width) * 100;
+                const offsetY = ((e.clientY - centerY) / rect.height) * 100;
+
+                const angle = 135 + offsetX * 1.2;
+                const stop1 = Math.max(10, 33 + offsetY * 0.3);
+                const stop2 = Math.min(90, 66 + offsetY * 0.4);
+                const intensity1 = 0.12 + Math.abs(offsetX) * 0.008;
+                const intensity2 = 0.4 + Math.abs(offsetX) * 0.012;
+
+                const gradScreen = `linear-gradient(${angle}deg,
+                    rgba(255,255,255,0) 0%,
+                    rgba(255,255,255,${intensity1}) ${stop1}%,
+                    rgba(255,255,255,${intensity2}) ${stop2}%,
+                    rgba(255,255,255,0) 100%)`;
+
+                const gradOverlay = `linear-gradient(${angle}deg,
+                    rgba(255,255,255,0) 0%,
+                    rgba(255,255,255,${intensity1 + 0.2}) ${stop1}%,
+                    rgba(255,255,255,${intensity2 + 0.2}) ${stop2}%,
+                    rgba(255,255,255,0) 100%)`;
+
+                borderScreen.style.background = gradScreen;
+                borderOverlay.style.background = gradOverlay;
+            });
+
+            glassPanel.addEventListener('mouseleave', () => {
+                const defaultGrad = `linear-gradient(135deg,
+                    rgba(255,255,255,0) 0%,
+                    rgba(255,255,255,0.12) 33%,
+                    rgba(255,255,255,0.4) 66%,
+                    rgba(255,255,255,0) 100%)`;
+                borderScreen.style.background = defaultGrad;
+                borderOverlay.style.background = defaultGrad;
+            });
+
+            // Set initial gradient
+            const defaultGrad = `linear-gradient(135deg,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.12) 33%,
+                rgba(255,255,255,0.4) 66%,
+                rgba(255,255,255,0) 100%)`;
+            borderScreen.style.background = defaultGrad;
+            borderOverlay.style.background = defaultGrad;
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WishCraft — Voice-Controlled Desktop Genie</title>
+    <meta name="description"
+        content="WishCraft is a multimodal AI desktop assistant powered by Gemini Live API. A 3D holographic genie that hears your voice, sees your screen, and acts on your commands.">
+    <meta name="theme-color" content="#0a0a1a">
+    <link rel="icon" href="assets/lamp-icon.png" type="image/png">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="WishCraft — Voice-Controlled Desktop Genie">
+    <meta property="og:description"
+        content="A multimodal AI desktop assistant with 3D avatar, real-time voice, screen vision, and 221+ automation actions.">
+    <meta property="og:image" content="assets/og-image.png">
+    <meta property="og:type" content="website">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0a1a;
+            --bg-card: rgba(20, 15, 40, 0.6);
+            --purple: #7c3aed;
+            --purple-light: #a78bfa;
+            --cyan: #00dce8;
+            --cyan-glow: rgba(0, 220, 232, 0.15);
+            --gold: #fbbf24;
+            --text: #e2e8f0;
+            --text-dim: rgba(180, 160, 255, 0.6);
+            --border: rgba(124, 58, 237, 0.15);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ========== NAV ========== */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 26, 0.85);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .nav-brand img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--cyan);
+        }
+
+        .nav-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--purple);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-cta:hover {
+            background: #6d28d9;
+            transform: translateY(-1px);
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 24px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 50% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 220, 232, 0.05) 0%, transparent 40%);
+            animation: rotate-bg 30s linear infinite;
+        }
+
+        @keyframes rotate-bg {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(124, 58, 237, 0.12);
+            border: 1px solid rgba(124, 58, 237, 0.25);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--purple-light);
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 6vw, 72px);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--purple-light), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-dim);
+            max-width: 640px;
+            margin-bottom: 36px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--purple), #5b21b6);
+            color: #fff;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 24px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ========== FEATURES ========== */
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 24px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .section-title p {
+            color: var(--text-dim);
+            font-size: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(124, 58, 237, 0.35);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(124, 58, 237, 0.1);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            color: var(--text-dim);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* ========== ARCHITECTURE ========== */
+        .arch-visual {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .arch-visual pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            line-height: 1.5;
+            color: var(--purple-light);
+            text-align: left;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* ========== TECH STACK ========== */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .tech-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .tech-item:hover {
+            border-color: rgba(0, 220, 232, 0.3);
+        }
+
+        .tech-item .tech-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .tech-item .tech-desc {
+            color: var(--text-dim);
+            font-size: 12px;
+        }
+
+        /* ========== DOWNLOAD ========== */
+        .download-section {
+            text-align: center;
+            padding: 100px 24px;
+            position: relative;
+        }
+
+        .download-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(124, 58, 237, 0.06) 0%, transparent 70%);
+        }
+
+        .download-cards {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .download-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            width: 280px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .download-card:hover {
+            border-color: var(--purple);
+            transform: translateY(-4px);
+        }
+
+        .download-card .os-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .download-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .download-card p {
+            color: var(--text-dim);
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .download-card .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--purple);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .download-card .btn-download:hover {
+            background: #6d28d9;
+        }
+
+        /* ========== FOOTER ========== */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 24px;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+
+        footer a {
+            color: var(--purple-light);
+            text-decoration: none;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .download-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="nav-inner">
+            <a href="#" class="nav-brand">
+                <img src="assets/lamp-icon.png" alt="WishCraft">
+                WishCraft
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#tech">Tech Stack</a></li>
+                <li><a href="#download">Download</a></li>
+            </ul>
+            <a href="#download" class="nav-cta">⬇ Download</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-badge">🧞 Powered by Gemini Live API</div>
+        <h1>Your Wishes Are<br><span class="gradient">My Command</span></h1>
+        <p>A multimodal AI desktop assistant with a 3D holographic genie avatar. It hears your voice, sees your screen,
+            and acts on your commands — all in real-time.</p>
+        <div class="hero-buttons">
+            <a href="#download" class="btn-primary">⬇ Download for macOS</a>
+            <a href="https://github.com/abubokkor-cse/wishcraft" class="btn-secondary" target="_blank" rel="noopener">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.73.083-.73 1.205.085 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+                GitHub
+            </a>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="section">
+        <div class="section-title">
+            <h2>✨ Features</h2>
+            <p>A magical AI assistant that does more than just talk</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(124,58,237,0.12);">🗣️</div>
+                <h3>Real-Time Voice</h3>
+                <p>Live audio streaming via Gemini Native Audio — not turn-based. Continuous conversation with natural
+                    interruptions, in 8 languages.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(0,220,232,0.12);">👀</div>
+                <h3>Screen Vision</h3>
+                <p>The genie can see your screen through desktop capture. It observes, understands, and acts on what it
+                    sees — powered by Gemini Computer Use.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(251,191,36,0.12);">🧞</div>
+                <h3>3D Holographic Avatar</h3>
+                <p>A Three.js-powered 3D genie with lip-synced speech, mood expressions, eye contact, and magical smoke
+                    effects. Male and female avatars.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(52,168,83,0.12);">⚡</div>
+                <h3>221+ Automation Actions</h3>
+                <p>Control Finder, Notes, Messages, Calendar, VS Code, Safari, Music, Terminal, and more through 221
+                    deterministic macOS automation functions.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(234,67,53,0.12);">🔍</div>
+                <h3>Google Search Grounding</h3>
+                <p>Real-time factual information via Google Search grounding. No hallucination — the genie always checks
+                    the latest data before answering.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:rgba(66,133,244,0.12);">🧠</div>
+                <h3>Encrypted Memory</h3>
+                <p>Persistent memory that learns your preferences, remembers your name, and improves across sessions.
+                    All AES-256-GCM encrypted locally.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ARCHITECTURE -->
+    <section id="architecture" class="section">
+        <div class="section-title">
+            <h2>🏗️ Architecture</h2>
+            <p>3-tier smart agent routing for maximum speed and reliability</p>
+        </div>
+        <div class="arch-visual">
+            <pre>
+┌───────────────────────────────────────────────────────────────┐
+│                   WishCraft Electron App                       │
+│                                                                │
+│  ┌─────────────┐   ┌───────────────┐   ┌──────────────────┐   │
+│  │  3D Avatar   │   │  Agent Brain   │   │  Gemini Live API │   │
+│  │  Three.js    │◀──│  29 Tools      │──▶│  WebSocket       │   │
+│  │  Lip Sync    │   │  3-Tier Route  │   │  Native Audio    │   │
+│  └─────────────┘   └───────┬───────┘   │  Google Search   │   │
+│                            │           └──────────────────┘   │
+│  ┌─────────────────────────┴──────────────────────────────┐   │
+│  │                 Electron Main Process                    │   │
+│  │  Screen Capture · Python Bridge · Encrypted Storage     │   │
+│  └────────┬─────────────────────────────────┬─────────────┘   │
+└───────────┼─────────────────────────────────┼─────────────────┘
+            │                                 │
+            ▼                                 ▼
+┌───────────────────────┐       ┌──────────────────────────────┐
+│  🐍 Python Bridge      │       │  ☁️  Google Cloud Platform     │
+│                        │       │                               │
+│  Tier 1: AppleScript   │       │  Cloud Run (Token + CU Proxy)│
+│  Tier 2: 221 Actions   │       │  Firestore (Wish History)    │
+│  Tier 3: Computer Use  │       │  Cloud Storage (Sync)        │
+│                        │       │  Firebase Hosting (Website)  │
+│  google-genai SDK      │       │                               │
+└────────────────────────┘       └──────────────────────────────┘
+</pre>
+        </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <section id="tech" class="section">
+        <div class="section-title">
+            <h2>🛠️ Built With</h2>
+            <p>Powered by Google's best AI and cloud technologies</p>
+        </div>
+        <div class="tech-grid">
+            <div class="tech-item">
+                <div class="tech-name">Gemini 2.5 Flash</div>
+                <div class="tech-desc">Native Audio Preview<br>Real-time voice</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Gemini Computer Use</div>
+                <div class="tech-desc">2.5 CU Preview<br>Screen → Actions</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Google Search</div>
+                <div class="tech-desc">Grounding<br>No hallucination</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Google GenAI SDK</div>
+                <div class="tech-desc">Python + Node.js<br>Official SDK</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Cloud Run</div>
+                <div class="tech-desc">Backend server<br>Auto-scaling</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Cloud Firestore</div>
+                <div class="tech-desc">Wish history<br>NoSQL database</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Cloud Storage</div>
+                <div class="tech-desc">Encrypted sync<br>Cross-device backup</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Firebase Hosting</div>
+                <div class="tech-desc">Landing website<br>CDN global</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Electron 33</div>
+                <div class="tech-desc">Desktop app<br>macOS + Windows</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Three.js</div>
+                <div class="tech-desc">3D avatar<br>GLB models</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">AES-256-GCM</div>
+                <div class="tech-desc">Encrypted storage<br>All user data</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">PyAutoGUI</div>
+                <div class="tech-desc">Desktop control<br>221 actions</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOWNLOAD -->
+    <section id="download" class="download-section">
+        <div class="section-title" style="position:relative; z-index:1;">
+            <h2>⬇ Download WishCraft</h2>
+            <p>Choose your platform and summon the genie</p>
+        </div>
+        <div class="download-cards">
+            <div class="download-card">
+                <div class="os-icon">🍎</div>
+                <h3>macOS</h3>
+                <p>macOS 12+ (Monterey)<br>Apple Silicon & Intel</p>
+                <a href="#" class="btn-download">Download .dmg</a>
+            </div>
+            <div class="download-card">
+                <div class="os-icon">🪟</div>
+                <h3>Windows</h3>
+                <p>Windows 10+<br>64-bit</p>
+                <a href="#" class="btn-download">Download .exe</a>
+            </div>
+            <div class="download-card">
+                <div class="os-icon">🐧</div>
+                <h3>Source Code</h3>
+                <p>Build from source<br>Any platform</p>
+                <a href="https://github.com/abubokkor-cse/wishcraft" class="btn-download" target="_blank"
+                    rel="noopener">GitHub</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>🧞 WishCraft — Built with ✨ for the <a href="https://geminiliveagentchallenge.devpost.com/" target="_blank"
+                rel="noopener">Gemini Live Agent Challenge</a></p>
+        <p style="margin-top:8px;">Powered by Google Gemini · Cloud Run · Firebase · Firestore · Cloud Storage</p>
+        <p style="margin-top:16px; opacity:0.5;">© 2026 WishCraft. MIT License.</p>
+    </footer>
+
+</body>
+
+</html>

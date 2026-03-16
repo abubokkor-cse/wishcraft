@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build output
+dist/
+out/
+build/
+
+# Environment & secrets
+.env
+.env.*
+*.enc
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# macOS
+.DS_Store
+*.swp
+*.swo
+
+# Electron
+*.log
+
+# Config (contains encrypted API keys)
+config.enc
+
+# Large downloads
+*.tar.gz
+
+# IDE
+.vscode/
+.idea/
+
+# Gemini agent
+.gemini/
+
+# Devpost Submissions
+devpost/
